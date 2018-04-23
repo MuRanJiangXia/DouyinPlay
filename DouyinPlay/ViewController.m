@@ -106,16 +106,11 @@
         [self.videoView.videoShowView.layer addSublayer:layer];
     }
     [self.videoView.player replaceCurrentItemWithPlayerItem:playerItem];
-    NSLog(@"naturalSize : %@",NSStringFromCGSize(self.composition.naturalSize) );
-
-    NSLog(@"playerLayer.frame : %@",NSStringFromCGRect(self.videoView.playerLayer.frame) );
-   
 
 }
 
 #pragma mark - 视频编辑
 -(void)videoEdit{
-    
     //1,将素材拖入到素材库
     AVAsset *asset = [AVAsset assetWithURL:self.videoUrl];
     //素材的视频轨
@@ -154,7 +149,7 @@
     // 3.2 AVMutableVideoCompositionLayerInstruction 一个视频轨道，包含了这个轨道上的所有视频素材
     AVAssetTrack *videoTrack = [self.composition tracksWithMediaType:AVMediaTypeVideo][0];
     AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:videoTrack];
-
+    //视频旋转处理
     if (self.isRotate) {
         CGAffineTransform t1 = CGAffineTransformMakeTranslation(videoCompositionTrack.naturalSize.height, 0.0);
         // Rotate transformation
@@ -167,6 +162,7 @@
     instruction.layerInstructions = [NSArray arrayWithObjects:layerInstruction,nil];
     self.videoComposition.instructions = [NSArray arrayWithObject:instruction];
     
+    //添加水印 重新刷新player的时候会重置 所以在导出水印的时候添加水印
 
 }
 #pragma mark - 更新保存进度条
@@ -201,7 +197,7 @@
         [parentLayer addSublayer:videoLayer];
         exportWatermarkLayer.position = CGPointMake(self.videoComposition.renderSize.width/2, self.videoComposition.renderSize.height/4);
         [parentLayer addSublayer:exportWatermarkLayer];
-        //设置封面
+        
         CABasicAnimation *anima = [CABasicAnimation animationWithKeyPath:@"opacity"];
         anima.fromValue = [NSNumber numberWithFloat:1.0f];
         anima.toValue = [NSNumber numberWithFloat:0.0f];
